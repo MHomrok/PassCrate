@@ -39,7 +39,7 @@ def main():
         show_register_screen()
 
 
-#Custom button for removing entries
+#Custom button for removing entries - icon
 class MyButton(tk.Button):
     def __init__(self, *args, **kwargs):
         tk.Button.__init__(self, *args, **kwargs)
