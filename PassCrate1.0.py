@@ -158,11 +158,11 @@ def show_main_screen():
     packer1.pack(side=tk.RIGHT, fill=tk.BOTH)
 
     header = tk.Frame(packer)
-    l=tk.Label(header, width=31, text="Title", borderwidth=0, anchor="w", bg="white", fg="#44719c", font=("Segoe UI", 11))
+    l=tk.Label(header, width=31, text="Title", borderwidth=0, anchor="w", bg="white", fg="#056b5c", font=("Segoe UI", 11))
     l.grid(row=0, column=0)
-    l=tk.Label(header, width=31, text="Username", borderwidth=0, anchor="w", bg="white", fg="#44719c", font=("Segoe UI", 11))
+    l=tk.Label(header, width=31, text="Username", borderwidth=0, anchor="w", bg="white", fg="#056b5c", font=("Segoe UI", 11))
     l.grid(row=0, column=1)
-    l=tk.Label(header, width=31, text="Password", borderwidth=0, anchor="w", bg="white", fg="#44719c", font=("Segoe UI", 11))
+    l=tk.Label(header, width=31, text="Password", borderwidth=0, anchor="w", bg="white", fg="#056b5c", font=("Segoe UI", 11))
     l.grid(row=0, column=2)
     header.pack(anchor=tk.NW, padx=15)
     
