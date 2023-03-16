@@ -3,14 +3,16 @@
 
 block_cipher = None
 
-
 added_files = [
-    ( 'D:\Coding\VSCode\pman\keyicon.ico', '.' ),
-    ( 'D:\Coding\VSCode\pman\icontrash.png', '.' ),
-]
+         ( 'D:\Coding\VSCode\PassCrate/iconadd.png', '.' ),
+         ( 'D:\Coding\VSCode\PassCrate/iconpencil.png', '.' ),
+	 ( 'D:\Coding\VSCode\PassCrate/icontrash.png', '.' ),
+	 ( 'D:\Coding\VSCode\PassCrate/keyicon.ico', '.' )
+         ]
+
 
 a = Analysis(
-    ['PassCrate1.0.py'],
+    ['PassCrate1.0.py', 'PassCrate1.0.spec'],
     pathex=[],
     binaries=[],
     datas=added_files,
@@ -46,5 +48,4 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['keyicon.ico'],
 )

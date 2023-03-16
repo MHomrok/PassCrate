@@ -13,6 +13,28 @@ from cryptography.hazmat.backends import default_backend
 
 basedir = os.path.dirname(__file__)
 
+#Custom button for removing entries - icon
+class MyButton(tk.Button):
+    def __init__(self, *args, **kwargs):
+        tk.Button.__init__(self, *args, **kwargs)
+        self.photo = tk.PhotoImage(file=os.path.join(basedir, "icontrash.png"))
+        self["image"] = self.photo
+        self.config(background="white", borderwidth=0, width=25, height=25)
+
+class Pencil(tk.Button):
+    def __init__(self, *args, **kwargs):
+        tk.Button.__init__(self, *args, **kwargs)
+        self.photo = tk.PhotoImage(file=os.path.join(basedir, "iconpencil.png"))
+        self["image"] = self.photo
+        self.config(background="white", borderwidth=0, width=25, height=25)
+
+class Addbutton(tk.Button):
+    def __init__(self, *args, **kwargs):
+        tk.Button.__init__(self, *args, **kwargs)
+        self.photo = tk.PhotoImage(file=os.path.join(basedir, "iconadd.png"))
+        self["image"] = self.photo
+        self.config(background="white", borderwidth=0, width=35, height=35)
+
 
 def main():
     global cursor
@@ -39,15 +61,6 @@ def main():
         show_register_screen()
 
 
-#Custom button for removing entries - icon
-class MyButton(tk.Button):
-    def __init__(self, *args, **kwargs):
-        tk.Button.__init__(self, *args, **kwargs)
-        self.photo = tk.PhotoImage(file=os.path.join(basedir, "icontrash.png"))
-        self["image"] = self.photo
-        self.config(background="white", borderwidth=0, width=25, height=25)
-
-
 #Show saved passwords from the database
 def load_list():
     s = ttk.Style()
@@ -60,7 +73,7 @@ def load_list():
     j=0
     for data in cursor: 
         for j in range(len(data)-1):
-            e = tk.Entry(list_frame, width=28, font=("Segoe UI", 12), borderwidth=5, relief=tk.FLAT) 
+            e = tk.Entry(list_frame, width=30, font=("Segoe UI", 11), borderwidth=5, relief=tk.FLAT) 
             e.grid(row=i, column=j)
             if j > 0:
                 e.insert(tk.END, f.decrypt(data[j+1]))
@@ -72,9 +85,11 @@ def load_list():
         canvas.configure(height="%d" % (h))
         h = h + 35
         b = MyButton(list_frame, command = lambda d=str(data[0]):del_item(d))       #Add trash button to the end
-        b.grid(row=i, column=4)
+        b.grid(row=i, column=5)
+        pen = Pencil(list_frame, command = lambda x=data[1], y=f.decrypt(data[2]), z=f.decrypt(data[3]), id=str(data[0]):edit_scr(x, y, z, id))
+        pen.grid(row=i, column=4)
         sep = ttk.Separator(list_frame, orient="horizontal", style="lg.TSeparator") #Add line after row
-        sep.grid(column=0, row=i+1, sticky="we", columnspan=3, padx=25)     
+        sep.grid(column=0, row=i+1, sticky="we", columnspan=6, padx=15)     
         i=i+2
     updateScrollRegion()
 
@@ -135,19 +150,21 @@ def show_main_screen():
     y = (hs/2) - (h/2)
     root.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
+    root.wm_attributes("-transparentcolor", "red")
+
     packer = tk.Frame(root,bg="white")
     packer.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
     packer1 = tk.Frame(root,bg="white")
     packer1.pack(side=tk.RIGHT, fill=tk.BOTH)
 
     header = tk.Frame(packer)
-    l=tk.Label(header, width=37, text="Title", borderwidth=0, anchor="w", bg="white", fg="#44719c")
+    l=tk.Label(header, width=31, text="Title", borderwidth=0, anchor="w", bg="white", fg="#44719c", font=("Segoe UI", 11))
     l.grid(row=0, column=0)
-    l=tk.Label(header, width=37, text="Username", borderwidth=0, anchor="w", bg="white", fg="#44719c")
+    l=tk.Label(header, width=31, text="Username", borderwidth=0, anchor="w", bg="white", fg="#44719c", font=("Segoe UI", 11))
     l.grid(row=0, column=1)
-    l=tk.Label(header, width=37, text="Password", borderwidth=0, anchor="w", bg="white", fg="#44719c")
+    l=tk.Label(header, width=31, text="Password", borderwidth=0, anchor="w", bg="white", fg="#44719c", font=("Segoe UI", 11))
     l.grid(row=0, column=2)
-    header.pack(anchor=tk.NW, padx=5)
+    header.pack(anchor=tk.NW, padx=15)
     
     canvas = tk.Canvas(packer, height=35)
     canvas.pack(fill=tk.X, side=tk.LEFT, expand=1, anchor=tk.NW)
@@ -166,9 +183,8 @@ def show_main_screen():
 
     load_list()
 
-    add_button = ttk.Button(text="Add", command = add_item_scr)
-    add_button.configure()
-    add_button.place(x=720, y=450)
+    add_button = Addbutton(text="Add", command = add_item_scr)
+    add_button.place(x=710, y=440)
     add_button.lift()
 
     root.mainloop()
@@ -195,20 +211,17 @@ def add_item_scr():
 
     t = ttk.Label(frame, text="Title", font=("Segoe UI", 12), padding=3)
     t.pack()
-
     t_add = ttk.Entry(frame, font=("Segoe UI", 14))
     t_add.pack()
     t_add.focus()
 
     u = ttk.Label(frame, text="Username", font=("Segoe UI", 12), padding=3)
     u.pack()
-
     u_add = ttk.Entry(frame, font=("Segoe UI", 14))
     u_add.pack()
 
     p = ttk.Label(frame, text="Password", font=("Segoe UI", 12), padding=3)
     p.pack()
-
     p_add = ttk.Entry(frame, font=("Segoe UI", 14))
     p_add.pack()
 
@@ -224,10 +237,8 @@ def add_item_scr():
     #Bindings for paste popups and commands 
     t_add.bind("<Button-3>", lambda event: t_add.focus_set(), add="+") 
     t_add.bind("<Button-3>", paste_popup, add="+") 
-
     u_add.bind("<Button-3>", lambda event: u_add.focus_set(), add="+")
     u_add.bind("<Button-3>", paste_popup, add="+")
-    
     p_add.bind("<Button-3>", lambda event: p_add.focus_set(), add="+")
     p_add.bind("<Button-3>", paste_popup, add="+")
 
@@ -287,14 +298,12 @@ def show_register_screen():
 
     p = ttk.Label(frame, text="Create Master Password", font=("Segoe UI", 10))
     p.pack(pady=3)
-
     p_reg = ttk.Entry(frame, font=("Segoe UI", 14))
     p_reg.pack(pady=3)
     p_reg.focus()
 
     cp = ttk.Label(frame, text="Confirm Master Password", font=("Segoe UI", 10))
     cp.pack(pady=3)
-
     cp_reg = ttk.Entry(frame, font=("Segoe UI", 14))
     cp_reg.pack(pady=3)
 
@@ -302,7 +311,6 @@ def show_register_screen():
     register_button.pack(pady=5)
 
     register_screen.bind('<Return>', lambda event: register())  #Enter key bind
-
     register_screen.mainloop()
 
 
@@ -332,7 +340,6 @@ def show_login_screen():
 
     p = ttk.Label(frame, text="Enter Master Password", font=("Segoe UI", 10))
     p.pack(pady=7)
-
     p_log = ttk.Entry(frame, font=("Segoe UI", 14))
     p_log.pack(pady=1)
     p_log.focus()
@@ -341,7 +348,6 @@ def show_login_screen():
     login_button.pack(pady=15)
 
     login_screen.bind('<Return>', lambda event: login())    #Enter key bind
-
     login_screen.mainloop()
 
 
@@ -399,7 +405,79 @@ def login():
         
         login_screen.destroy()
         show_main_screen()
-    
+
+
+def edit_scr(title, username, password, id):
+    global edit_screen
+    global t_edit
+    global u_edit
+    global p_edit
+    global menu
+
+    #Position of root window
+    x = root.winfo_rootx()
+    y = root.winfo_rooty()
+
+    edit_screen = tk.Toplevel(root)
+    edit_screen.iconbitmap(default=os.path.join(basedir, "keyicon.ico"))
+    edit_screen.geometry("300x250+%d+%d" % (x+270, y+110))   #Position of add window related to main window
+    edit_screen.title("Edit Password")
+    edit_screen.resizable(False, False)
+    frame = tk.Frame(edit_screen)
+    frame.pack(pady=10)
+
+    t = ttk.Label(frame, text="Title", font=("Segoe UI", 12), padding=3)
+    t.pack()
+
+    t_edit = ttk.Entry(frame, font=("Segoe UI", 14))
+    t_edit.insert(0, title)
+    t_edit.pack()
+    t_edit.focus()
+
+    u = ttk.Label(frame, text="Username", font=("Segoe UI", 12), padding=3)
+    u.pack()
+
+    u_edit = ttk.Entry(frame, font=("Segoe UI", 14))
+    u_edit.insert(0, username)
+    u_edit.pack()
+
+    p = ttk.Label(frame, text="Password", font=("Segoe UI", 12), padding=3)
+    p.pack()
+
+    p_edit = ttk.Entry(frame, font=("Segoe UI", 14))
+    p_edit.insert(0, password)
+    p_edit.pack()
+
+    save_button = ttk.Button(frame, text="Save", command = lambda: save_edit(id))
+    save_button.pack(pady=10)
+
+    edit_screen.bind('<Return>', lambda event: save_edit(id))  #Enter key bind
+
+    #Paste popup menu
+    menu = tk.Menu(edit_screen, tearoff = 0)
+    menu.add_command(label ="Paste", command = lambda: paste_text(False))  
+
+    #Bindings for paste popups and commands 
+    t_edit.bind("<Button-3>", lambda event: t_edit.focus_set(), add="+") 
+    t_edit.bind("<Button-3>", paste_popup, add="+") 
+    u_edit.bind("<Button-3>", lambda event: u_edit.focus_set(), add="+")
+    u_edit.bind("<Button-3>", paste_popup, add="+")
+    p_edit.bind("<Button-3>", lambda event: p_edit.focus_set(), add="+")
+    p_edit.bind("<Button-3>", paste_popup, add="+")
+
+
+def save_edit(id):
+    title_edit = t_edit.get().encode()
+    username_edit = f.encrypt(u_edit.get().encode())
+    password_edit = f.encrypt(p_edit.get().encode())
+
+    cursor.execute("UPDATE passwords SET title = ?, username = ?, password = ? WHERE id = ?", (title_edit, username_edit, password_edit, id))
+    sql_connect.commit()
+
+    edit_screen.destroy()
+    load_list()
+    add_button.lift()
+
     
 if __name__ == "__main__":
     main()
