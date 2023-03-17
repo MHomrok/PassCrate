@@ -41,7 +41,7 @@ def main():
     global sql_connect
 
     #Load database
-    sql_connect = sqlite3.connect("database.db")
+    sql_connect = sqlite3.connect("PassCrate.db")
     cursor = sql_connect.cursor()
 
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='master'")
@@ -63,12 +63,10 @@ def main():
 
 #Show saved passwords from the database
 def load_list():
-    s = ttk.Style()
-    s.configure('lg.TSeparator', background='#b3d3f2')
     global e
     global m
     cursor.execute("SELECT * FROM passwords ORDER BY LOWER(title)")
-    h = 35
+    h = 33
     i=1
     j=0
     for data in cursor: 
@@ -83,13 +81,13 @@ def load_list():
             m = tk.Menu(list_frame, tearoff = 0)
             m.add_command(label = "Copy", command = lambda: copy_text(False))
         canvas.configure(height="%d" % (h))
-        h = h + 35
+        h = h + 33
         b = MyButton(list_frame, command = lambda d=str(data[0]):del_item(d))       #Add trash button to the end
         b.grid(row=i, column=5)
         pen = Pencil(list_frame, command = lambda x=data[1], y=f.decrypt(data[2]), z=f.decrypt(data[3]), id=str(data[0]):edit_scr(x, y, z, id))
         pen.grid(row=i, column=4)
-        sep = ttk.Separator(list_frame, orient="horizontal", style="lg.TSeparator") #Add line after row
-        sep.grid(column=0, row=i+1, sticky="we", columnspan=6, padx=15)     
+        separator = tk.Frame(list_frame, bg="#056b5c", height=1, bd=0)
+        separator.grid(column=0, row=i+1, sticky="we", columnspan=6, padx=15)
         i=i+2
     updateScrollRegion()
 
@@ -152,21 +150,21 @@ def show_main_screen():
 
     root.wm_attributes("-transparentcolor", "red")
 
-    packer = tk.Frame(root,bg="white")
+    packer = tk.Frame(root, bg="white")
     packer.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
-    packer1 = tk.Frame(root,bg="white")
+    packer1 = tk.Frame(root)
     packer1.pack(side=tk.RIGHT, fill=tk.BOTH)
 
     header = tk.Frame(packer)
-    l=tk.Label(header, width=31, text="Title", borderwidth=0, anchor="w", bg="white", fg="#056b5c", font=("Segoe UI", 11))
+    l=tk.Label(header, width=28, text="Title", borderwidth=0, anchor="w", bg="white", fg="#056b5c", font=("Segoe UI", 11, "bold"))
     l.grid(row=0, column=0)
-    l=tk.Label(header, width=31, text="Username", borderwidth=0, anchor="w", bg="white", fg="#056b5c", font=("Segoe UI", 11))
+    l=tk.Label(header, width=28, text="Username", borderwidth=0, anchor="w", bg="white", fg="#056b5c", font=("Segoe UI", 11, "bold"))
     l.grid(row=0, column=1)
-    l=tk.Label(header, width=31, text="Password", borderwidth=0, anchor="w", bg="white", fg="#056b5c", font=("Segoe UI", 11))
+    l=tk.Label(header, width=28, text="Password", borderwidth=0, anchor="w", bg="white", fg="#056b5c", font=("Segoe UI", 11, "bold"))
     l.grid(row=0, column=2)
-    header.pack(anchor=tk.NW, padx=15)
+    header.pack(anchor=tk.NW, padx=2)
     
-    canvas = tk.Canvas(packer, height=35)
+    canvas = tk.Canvas(packer, height=33)
     canvas.pack(fill=tk.X, side=tk.LEFT, expand=1, anchor=tk.NW)
 
     sb = ttk.Scrollbar(packer1, orient=tk.VERTICAL, command=canvas.yview)
@@ -192,9 +190,6 @@ def show_main_screen():
 
 def add_item_scr():
     global additem_screen
-    global t_add
-    global u_add
-    global p_add
     global menu
 
     #Position of root window
@@ -225,10 +220,10 @@ def add_item_scr():
     p_add = ttk.Entry(frame, font=("Segoe UI", 14))
     p_add.pack()
 
-    save_button = ttk.Button(frame, text="Save", command = save_item)
+    save_button = ttk.Button(frame, text="Save", command = lambda title=t_add, username = t_add, password = p_add:save_item(title, username, password))
     save_button.pack(pady=10)
 
-    additem_screen.bind('<Return>', lambda event: save_item())  #Enter key bind
+    additem_screen.bind('<Return>', lambda event: save_item(t_add, u_add, p_add))  #Enter key bind
 
     #Paste popup menu
     menu = tk.Menu(additem_screen, tearoff = 0)
@@ -260,10 +255,10 @@ def paste_popup(event):
         menu.grab_release()
 
 
-def save_item():
-    title_info = t_add.get().encode()
-    username_info = f.encrypt(u_add.get().encode())
-    password_info = f.encrypt(p_add.get().encode())
+def save_item(title, username, password):
+    title_info = title.get().encode()
+    username_info = f.encrypt(username.get().encode())
+    password_info = f.encrypt(password.get().encode())
 
     cursor.execute("INSERT INTO passwords (title, username, password) VALUES (?, ?, ?)", (title_info, username_info, password_info))
     sql_connect.commit()
@@ -298,13 +293,13 @@ def show_register_screen():
 
     p = ttk.Label(frame, text="Create Master Password", font=("Segoe UI", 10))
     p.pack(pady=3)
-    p_reg = ttk.Entry(frame, font=("Segoe UI", 14))
+    p_reg = ttk.Entry(frame, font=("Segoe UI", 14), show="*")
     p_reg.pack(pady=3)
     p_reg.focus()
 
     cp = ttk.Label(frame, text="Confirm Master Password", font=("Segoe UI", 10))
     cp.pack(pady=3)
-    cp_reg = ttk.Entry(frame, font=("Segoe UI", 14))
+    cp_reg = ttk.Entry(frame, font=("Segoe UI", 14), show="*")
     cp_reg.pack(pady=3)
 
     register_button = ttk.Button(frame, text="Create", command = register)
@@ -340,7 +335,7 @@ def show_login_screen():
 
     p = ttk.Label(frame, text="Enter Master Password", font=("Segoe UI", 10))
     p.pack(pady=7)
-    p_log = ttk.Entry(frame, font=("Segoe UI", 14))
+    p_log = ttk.Entry(frame, font=("Segoe UI", 14), show="*")
     p_log.pack(pady=1)
     p_log.focus()
 
