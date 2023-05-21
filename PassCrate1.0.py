@@ -220,7 +220,7 @@ def add_item_scr():
     p_add = ttk.Entry(frame, font=("Segoe UI", 14))
     p_add.pack()
 
-    save_button = ttk.Button(frame, text="Save", command = lambda title=t_add, username = t_add, password = p_add:save_item(title, username, password))
+    save_button = ttk.Button(frame, text="Save", command = lambda title=t_add, username = u_add, password = p_add:save_item(title, username, password))
     save_button.pack(pady=10)
 
     additem_screen.bind('<Return>', lambda event: save_item(t_add, u_add, p_add))  #Enter key bind
